@@ -1,0 +1,104 @@
+-- 1. Adopter Insertion
+INSERT INTO pawscueadoptions.adopter(AdopterId, AdopterName, ContactNum, EmailAddress, EmploymentStatus, WorkingHrs, WorkContactNum, EmployerName, WorkAddress, PetAloneHours, PetCareTaker)
+VALUES
+(
+	"ADP-1002", 
+    "Limlingan, Richard, E.", 
+    "0956-234-2115", 
+    "richardtetsuya@hotmail.com", 
+    "Working", 
+    "8", 
+    "0917 577 5833", 
+    "Edwin Ano", 
+    "1230, 24 Chino Roces Ave, Makati, 1230 Metro Manila", "6", "Spouse"
+);
+
+-- 2. Spouse Insertion ( + Adopter FK)
+INSERT INTO pawscueadoptions.spouse(SpouseId, SpouseName, WorkingHrs, WorkContactNum, EmployerName, WorkAddress, AdopterId)
+VALUES
+(
+	"AS-0002",	
+    "Limlingan, Maria, S.",	
+    "8",	
+    "0917 577 5833",	
+    "Luisa Estepa",	
+    "1633F Dimasalang St, Santa Cruz, Sta. Cruz, 1008 Metro Manila", 	
+    "ADP-1002"
+);
+
+-- 3. Address Insertion
+INSERT INTO pawscueadoptions.adopter_home_details(AdopterAddressId, Zipcode, HomeAddress, City, State, HousingStatus, HomePetPolicy, WindowScreens, HomeChildrenNum, PetLivingArea)
+VALUES
+(
+	"HOME-0002",	
+    "1114",	
+    "41 Tirad Pass",
+	"Quezon City",
+	"NCR",
+	"Rent",
+	"ALLOWED",
+	true,
+	"1",
+	"Indoors"
+);
+
+-- 4. Adopter Relation FK's Insertion
+UPDATE pawscueadoptions.adopter
+SET AdopterAddressId = "HOME-0002", SpouseId = "AS-0002"
+WHERE AdopterId = "ADP-1002";
+
+-- 5. Pets Insertion
+INSERT INTO pawscueadoptions.adopter_pets(PetId, PetBreed, PetAge, PetSpayNeuterStatus, PetYrsOwned, PetCurrentStatus, PetVaccination, AdopterId)
+VALUES
+(
+	"PET-0001",
+	"Aspin",
+	10,
+	"None",
+	10,
+	"Alive",
+	false,
+	"ADP-1002"
+),
+(
+	"PET-0002",	
+    "Belgian Malinois/ M",	
+    3,	
+    "None",	
+    2,	
+    "Rehomed",	
+    true,	
+    "ADP-1002"
+),
+(
+	"PET-0003",	
+    "Belgian Malinois/ M",	
+    4,
+    "None",
+    2,
+    "Rehomed",
+    true,
+    "ADP-1002"
+);
+
+-- 6. Household Adults Insertion
+INSERT INTO pawscueadoptions.household_adults(HouseholdAdultId, AdultName, AdultAllergy, WorkContactNum, AdultEmployer, AdultWorkAddress, AdopterId)
+VALUES
+(
+	"HA-0002",	
+    "San Juan, Mario N.",	
+    true,
+	null,
+    null,
+    null,
+    "ADP-1002"
+),
+(
+	"HA-0003",	
+    "Rails, Ruby, E.",	
+    false,	
+    "(02) 8741 1692",	
+    "Puregold",	
+    "J297+8JR G. Araneta Avenue, Corner E Rodriguez Sr. Ave, Quezon City, 1113 Metro Manila",	
+    "ADP-1002"
+)    
