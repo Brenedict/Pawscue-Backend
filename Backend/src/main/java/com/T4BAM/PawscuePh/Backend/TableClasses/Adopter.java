@@ -1,5 +1,9 @@
 package com.T4BAM.PawscuePh.Backend.TableClasses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -18,10 +22,13 @@ public class Adopter {
     @Column(name = "emailaddress")
     private String emailAddress;
 
-    @ManyToOne
-    @JoinColumn(name = "adopteraddressid", referencedColumnName = "adopteraddressid")
-    private AdopterHomeDetails adopterAddressId;
+    // @OneToOne
+    // @JoinColumn(name = "adopteraddressid", referencedColumnName = "adopteraddressid")
+    @Column(name = "adopteraddressid")
+    private String adopterAddressId;
 
+    // @OneToOne
+    // @JoinColumn(name = "spouseid")
     @Column(name = "spouseid")
     private String spouseId;
 
@@ -84,7 +91,7 @@ public class Adopter {
         this.emailAddress = emailAddress;
     }
 
-    public AdopterHomeDetails getAdopterAddress() {
+    public String getAdopterAddress() {
         return adopterAddressId;
     }
 
