@@ -22,15 +22,13 @@ public class Adopter {
     @Column(name = "emailaddress")
     private String emailAddress;
 
-    // @OneToOne
-    // @JoinColumn(name = "adopteraddressid", referencedColumnName = "adopteraddressid")
-    @Column(name = "adopteraddressid")
-    private String adopterAddressId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "adopteraddressid", referencedColumnName = "adopteraddressid")
+    private AdopterHomeDetails addressDetails;
 
-    // @OneToOne
-    // @JoinColumn(name = "spouseid")
-    @Column(name = "spouseid")
-    private String spouseId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "spouseid", referencedColumnName = "spouseid")
+    private Spouse spouseDetails;
 
     @Column(name = "employmentstatus")
     private String employmentStatus = "Working";
@@ -53,9 +51,7 @@ public class Adopter {
     @Column(name = "petcaretaker")
     private String petCareTaker = "Self";
 
-    public Adopter() {
-
-    }
+    public Adopter() {}
 
     // === Getters and Setters ===
 
@@ -91,20 +87,20 @@ public class Adopter {
         this.emailAddress = emailAddress;
     }
 
-    public String getAdopterAddress() {
-        return adopterAddressId;
+    public AdopterHomeDetails getAddressDetails() {
+        return addressDetails;
     }
 
-    public void setAdopterAddress(String adopterAddress) {
-        this.adopterAddressId = adopterAddressId;
+    public void setAddressDetails(AdopterHomeDetails addressDetails) {
+        this.addressDetails = addressDetails;
     }
 
-    public String getSpouseId() {
-        return spouseId;
+    public Spouse getSpouse() {
+        return spouseDetails;
     }
 
-    public void setSpouseId(String spouseId) {
-        this.spouseId = spouseId;
+    public void setSpouse(Spouse spouseDetails) {
+        this.spouseDetails = spouseDetails;
     }
 
     public String getEmploymentStatus() {
@@ -161,5 +157,24 @@ public class Adopter {
 
     public void setPetCareTaker(String petCareTaker) {
         this.petCareTaker = petCareTaker;
+    }
+
+    @Override
+    public String toString() {
+        return "Adopter{" +
+                "adopterId='" + adopterId + '\'' +
+                ", adopterName='" + adopterName + '\'' +
+                ", contactNum='" + contactNum + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", adopterAddressId='" + addressDetails + '\'' +
+                ", spouseId='" + spouseDetails + '\'' +
+                ", employmentStatus='" + employmentStatus + '\'' +
+                ", workingHrs=" + workingHrs +
+                ", workContactNum='" + workContactNum + '\'' +
+                ", employerName='" + employerName + '\'' +
+                ", workAddress='" + workAddress + '\'' +
+                ", petAloneHours=" + petAloneHours +
+                ", petCareTaker='" + petCareTaker + '\'' +
+                '}';
     }
 }
