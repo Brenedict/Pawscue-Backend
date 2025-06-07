@@ -105,23 +105,28 @@ CREATE TABLE Adopter_Pets(
 
 ALTER TABLE Adopter
 ADD CONSTRAINT fk_adopter_to_address
-FOREIGN KEY(AdopterAddressId) REFERENCES adopter_home_details(AdopterAddressId);
+FOREIGN KEY(AdopterAddressId) REFERENCES adopter_home_details(AdopterAddressId)
+ON DELETE CASCADE;
 
 ALTER TABLE Adopter
 ADD CONSTRAINT fk_adopter_to_spouse
-FOREIGN KEY(SpouseId) REFERENCES Spouse(SpouseId);
+FOREIGN KEY(SpouseId) REFERENCES Spouse(SpouseId)
+ON DELETE CASCADE;
 
 ALTER TABLE Spouse
 ADD CONSTRAINT fk_spouse_to_adopter
-FOREIGN KEY(AdopterId) REFERENCES Adopter(AdopterId);
+FOREIGN KEY(AdopterId) REFERENCES Adopter(AdopterId)
+ON DELETE CASCADE;
 
 ALTER TABLE household_adults
 ADD CONSTRAINT fk_adult_to_adopter
-FOREIGN KEY(AdopterId) REFERENCES Adopter(AdopterId);
+FOREIGN KEY(AdopterId) REFERENCES Adopter(AdopterId)
+ON DELETE CASCADE;
 
 ALTER TABLE adopter_pets
 ADD CONSTRAINT fk_pets_to_adopter
-FOREIGN KEY(AdopterId) REFERENCES Adopter(AdopterId);
+FOREIGN KEY(AdopterId) REFERENCES Adopter(AdopterId)
+ON DELETE CASCADE;
 
 
 
