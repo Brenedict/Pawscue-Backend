@@ -1,3 +1,4 @@
+-- THIS SQL SCRIPT IS NOT MANDATORY/REQUIRED, THIS IS ONLY TO SIMULATE THE DATABASE WITH SAMPLE DATA
 
 -- 1. Adopter insertions
 INSERT INTO pawscueadoptions.adopter(AdopterId, AdopterName, ContactNum, EmailAddress, EmploymentStatus, WorkingHrs, WorkContactNum, EmployerName, WorkAddress, PetAloneHours, PetCareTaker)

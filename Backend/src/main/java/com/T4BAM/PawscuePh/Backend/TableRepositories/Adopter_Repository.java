@@ -24,4 +24,8 @@ public interface Adopter_Repository extends JpaRepository<Adopter, String> {
     // Retrieves the last AdopterId
     @Query(value = "SELECT AdopterId FROM pawscueadoptions.adopter ORDER BY AdopterId desc LIMIT 1", nativeQuery = true)
     String getLastId();
+
+    @Modifying
+    @Query(value = "UPDATE pawscueadoptions.adopter SET AdopterAddressId = :adopterAddressId, SpouseId = :spouseId WHERE adopterId = :adopterId", nativeQuery = true)
+    void updateAdopterForeignKeys(@Param("adopterAddressId") String adopterAddressId, @Param("spouseId") String spouseId, @Param("adopterId") String adopterId);
 }
