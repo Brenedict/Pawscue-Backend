@@ -12,7 +12,7 @@ import com.T4BAM.PawscuePh.Backend.TableClasses.Adopter;
 
 @Repository
 public interface Adopter_Repository extends JpaRepository<Adopter, String> {
-    // General tuple selection query
+    // Adopterid specified tuple selection query
     @Query(value = "SELECT * FROM pawscueadoptions.adopter WHERE AdopterId = :adopterId", nativeQuery = true)
     Adopter getAdopterById(@Param("adopterId") String adopterId);
 
@@ -28,4 +28,9 @@ public interface Adopter_Repository extends JpaRepository<Adopter, String> {
     @Modifying
     @Query(value = "UPDATE pawscueadoptions.adopter SET AdopterAddressId = :adopterAddressId, SpouseId = :spouseId WHERE adopterId = :adopterId", nativeQuery = true)
     void updateAdopterForeignKeys(@Param("adopterAddressId") String adopterAddressId, @Param("spouseId") String spouseId, @Param("adopterId") String adopterId);
+
+    // All tuple deletion query
+    @Modifying
+    @Query(value = "DELETE FROM pawscueadoptions.adopter", nativeQuery = true)
+    void deleteAllAdopterRecords();
 }

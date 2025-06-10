@@ -20,4 +20,9 @@ public interface AdopterHomeDetails_Repository extends JpaRepository<AdopterHome
     // Retrieves the last AdopterAddressId
     @Query(value = "SELECT AdopterAddressId FROM pawscueadoptions.adopter_home_details ORDER BY AdopterAddressId desc LIMIT 1", nativeQuery = true)
     String getLastId();
+
+    // All tuple deletion query
+    @Modifying
+    @Query(value = "DELETE FROM pawscueadoptions.adopter_home_details", nativeQuery = true)
+    void deleteAllAdopterHomeDetailsRecords();
 }

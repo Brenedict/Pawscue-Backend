@@ -15,4 +15,9 @@ public interface Spouse_Repository extends JpaRepository<Spouse, String> {
     // Retrieves the last SpouseId
     @Query(value = "SELECT SpouseId FROM pawscueadoptions.spouse ORDER BY SpouseId desc LIMIT 1", nativeQuery = true)
     String getLastId();
+
+    // General tuple deletion query
+    @Modifying
+    @Query(value = "DELETE FROM pawscueadoptions.spouse WHERE AdopterId = :adopterId", nativeQuery = true)
+    void deleteSpouseRecord(@Param("adopterId") String adopterId);
 }

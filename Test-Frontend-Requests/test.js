@@ -59,26 +59,6 @@ const adopterData1 = {
             petcurrentstatus: "Rehomed",
             petvaccination: true,
             adopterid: null                         // FK
-        },
-        {
-            petid: null,                            // PK (auto generated)
-            petbreed: "Golden Retriever",
-            petage: 5,
-            petspayneuterstatus: "Spayed",
-            petyrsowned: 3,
-            petcurrentstatus: "Alive",
-            petvaccination: true,
-            adopterid: null                         // FK
-        },
-        {
-            petid: null,                            // PK (auto generated)
-            petbreed: "Siberian Husky",
-            petage: 4,
-            petspayneuterstatus: "Neutered",
-            petyrsowned: 2,
-            petcurrentstatus: "Alive",
-            petvaccination: true,
-            adopterid: null                         // FK
         }
     ],
 
@@ -100,24 +80,6 @@ const adopterData1 = {
             workcontactnum: "(02) 8741 1692",
             adultemployer: "Puregold",
             adultworkaddress: "J297+8JR G. Araneta Avenue, Quezon City",
-            adopterid: null                         // FK
-        },
-        {
-            householdadultid: null,                 // PK (auto generated)
-            adultname: "Dela Cruz, Ana P.",
-            adultallergy: false,
-            workcontactnum: "0917-123-4567",
-            adultemployer: "Tech Solutions",
-            adultworkaddress: "123 Main St, Manila",
-            adopterid: null                         // FK
-        },
-        {
-            householdadultid: null,                 // PK (auto generated)
-            adultname: "Santos, Luis M.",
-            adultallergy: true,
-            workcontactnum: null,
-            adultemployer: null,
-            adultworkaddress: null,
             adopterid: null                         // FK
         }
     ]
@@ -147,12 +109,20 @@ const adopterData = {
         },
         employmentStatus: "Working",
         workingHrs: 9,
-        workContactNum: "0917-222-3333",
-        employerName: "Tech Solutions",
+        workContactNum: "ASas",
+        employerName: "sads",
         workAddress: "123 Main St, Manila",
         petAloneHours: 5,
         petCareTaker: "Self",
-        spouse: null // Adopter without spouse
+        spouse: {
+            adopterId: "ADP-0000",                        // FK
+            workAddress: "QC",
+            workingHrs: 8,
+            spouseId: "AS-0000",                         // PK (auto generated)
+            spouseName: "Jo",
+            employerName: "Tech Solutions",
+            workContactNum: "0917-333-4444"
+        }
     },
 
     // Multivalued adopterpets
@@ -174,7 +144,7 @@ bt_POST.addEventListener("click", () => {
 });
 
 bt_UPDATE.addEventListener("click", () => {
-    updateAdopter(adopterData1);
+    updateAdopter(adopterData);
 })
 
 // INCOMPLETE DO NOT TOUCH UPDATE FUNCTION
