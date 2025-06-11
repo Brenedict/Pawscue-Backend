@@ -25,6 +25,8 @@ import com.T4BAM.PawscuePh.Backend.TableRepositories.AdopterHomeDetails_Reposito
 import com.T4BAM.PawscuePh.Backend.TableRepositories.AdopterPets_Repository;
 import com.T4BAM.PawscuePh.Backend.TableRepositories.HouseholdAdults_Repository;
 import com.T4BAM.PawscuePh.Backend.TableRepositories.Spouse_Repository;
+import com.T4BAM.PawscuePh.Backend.service.AdoptionFormInsertionLogic;
+import com.T4BAM.PawscuePh.Backend.service.IdGeneration;
 
 import jakarta.transaction.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,8 +41,8 @@ public class MainController {
     private final AdopterPets_Repository adopterPetsRepository;
     private final HouseholdAdults_Repository householdAdultsRepository;
     private final Spouse_Repository spouseRepository;
-
     private final IdGeneration idGeneration;
+    private final AdoptionFormInsertionLogic adoptionFormInsertionLogic;
 
     @Autowired
     public MainController(
@@ -49,7 +51,8 @@ public class MainController {
             AdopterPets_Repository adopterPetsRepository,
             HouseholdAdults_Repository householdAdultsRepository,
             Spouse_Repository spouseRepository,
-            IdGeneration idGeneration) 
+            IdGeneration idGeneration,
+            AdoptionFormInsertionLogic adoptionFormInsertionLogic) 
     {
         this.adopterRepository = adopterRepository;
         this.adopterHomeDetailsRepository = adopterHomeDetailsRepository;
@@ -57,8 +60,10 @@ public class MainController {
         this.householdAdultsRepository = householdAdultsRepository;
         this.spouseRepository = spouseRepository;
         this.idGeneration = idGeneration;
+        this.adoptionFormInsertionLogic = adoptionFormInsertionLogic;
     }
 
+    // General Fetch GET method requests
     @GetMapping(path = "/adopter")
     public List<Adopter> getAdopters() {
         return adopterRepository.findAll();
@@ -89,19 +94,9 @@ public class MainController {
         return adopterRepository.getAdopterById(adopterId);
     }
 
-    // Deletes adopter record, {adopterId} specifies which adopter to delete 
-    @CrossOrigin(origins = "*")
-    @Transactional
-    @DeleteMapping(path = "/adopter/{adopterId}/delete-record")
-    public void deleteRecord(@PathVariable String adopterId) {
-        // Queries the adopterAddressId from adopter record since home details is not affected by cascade deletion
-        String adopterAddressId = adopterRepository.getAdopterById(adopterId).getAddressDetails().getAdopterAddressId();
-        
-        adopterRepository.deleteAdopterRecord(adopterId);
-        adopterHomeDetailsRepository.deleteAdopterHomeDetailsRecord(adopterAddressId);
-    }
+    // >> CRUD Function Operations
 
-    // Test function for quick clearing of database. WARNING: DELETES ALL RECORDS
+    // DELETE Function. WARNING: DELETES ALL RECORDS!
     @CrossOrigin(origins = "*")
     @Transactional
     @DeleteMapping(path = "/delete-all-records")
@@ -110,75 +105,16 @@ public class MainController {
         adopterHomeDetailsRepository.deleteAllAdopterHomeDetailsRecords();
     }
 
-    public Adopter save_Adopter_and_HomeDetails_and_Spouse(Adopter adopter, String adopterId) {
-        String adopterAddressId = idGeneration.generateAdopterAddressId();
-        String spouseId = idGeneration.generateSpouseId();
-
-        adopter.setAdopterId(adopterId);
+    // DELETE Function. Deletes the record of an adopter specified by {adopterId}
+    @CrossOrigin(origins = "*")
+    @Transactional
+    @DeleteMapping(path = "/full-application/{adopterId}/delete-record")
+    public void deleteRecord(@PathVariable String adopterId) {
+        // Queries the adopterAddressId from adopter record since home details is not affected by cascade deletion
+        String adopterAddressId = adopterRepository.getAdopterById(adopterId).getAddressDetails().getAdopterAddressId();
         
-        AdopterHomeDetails tempAdopterHomeDetails = adopter.getAddressDetails();
-        adopter.setAddressDetails(null);
-
-        Spouse tempSpouse = adopter.getSpouse();
-        adopter.setSpouse(null);
-
-        // Inserts the JSON into the DBMS without the Adopter class FK's: AdopterAddressId and SpouseId due to their parent and children relation
-        adopterRepository.save(adopter);
-
-        // Attaches the adopterAddressId to the AdopterHomeDetails Class
-        tempAdopterHomeDetails.setAdopterAddressId(adopterAddressId);
-        
-        // Saves the home details to its respective relation
-        adopterHomeDetailsRepository.save(tempAdopterHomeDetails);
-
-        // Handles logic when the adopter has no spouse
-        if(tempSpouse != null) {
-
-            // Attaches the spouseId to the Spouse Class
-            tempSpouse.setSpouseId(spouseId);
-            
-            // Attaches the adopterId to the Spouse Class that references the adopter
-            tempSpouse.setAdopterId(adopterId);   
-            
-            spouseRepository.save(tempSpouse);
-        } else {
-            spouseId = null;
-        }
-
-        // Updates the adopter's foreign keys to correspond to the spouse and adopter home details entities
-        adopterRepository.updateAdopterForeignKeys(adopterAddressId, spouseId, adopterId);
-        
-        // Properly sets the adopter entity to contain it's spouse and home details which was previously removed
-        adopter.setAddressDetails(tempAdopterHomeDetails);
-        adopter.setSpouse(tempSpouse);
-
-        return adopter;
-    }
-
-    public List<AdopterPets> saveAdopterPets(List<AdopterPets> adopterPets, String adopterId) {
-        for(int i = 0 ; i < adopterPets.size() ; i++) {
-            String petId = idGeneration.generateAdopterPetsId();
-            
-            adopterPets.get(i).setPetid(petId);
-            adopterPets.get(i).setAdopterid(adopterId);
-
-            adopterPetsRepository.save(adopterPets.get(i));
-        }
-
-        return adopterPets;
-    }
-
-    public List<HouseholdAdults> saveHouseholdAdults(List<HouseholdAdults> householdAdults, String adopterId) {
-        for(int i = 0 ; i < householdAdults.size() ; i++) {
-            String householdAdultsId = idGeneration.generateHouseholdAdultsId();
-            
-            householdAdults.get(i).setHouseholdadultid(householdAdultsId);
-            householdAdults.get(i).setAdopterid(adopterId);
-
-            householdAdultsRepository.save(householdAdults.get(i));
-        }
-
-        return householdAdults;
+        adopterRepository.deleteAdopterRecord(adopterId);
+        adopterHomeDetailsRepository.deleteAdopterHomeDetailsRecord(adopterAddressId);
     }
 
     // POST Function. Saves adoption record by API requests with the use of JSON.
@@ -190,18 +126,19 @@ public class MainController {
         String adopterId = idGeneration.generateAdopterId();
 
         // Handles adopter, spouse, home details primary key IDs, foreign keys logic, and insertion
-        fullAdoptionForm.setAdopter(save_Adopter_and_HomeDetails_and_Spouse(fullAdoptionForm.getAdopter(), adopterId));
+        fullAdoptionForm.setAdopter(adoptionFormInsertionLogic.save_Adopter_and_HomeDetails_and_Spouse(fullAdoptionForm.getAdopter(), adopterId));
         
         // Handles single/multiple adopter pets id generation, foreign key logic and insertion
-        fullAdoptionForm.setAdopterPets(saveAdopterPets(fullAdoptionForm.getAdopterPets(), adopterId));
+        fullAdoptionForm.setAdopterPets(adoptionFormInsertionLogic.saveAdopterPets(fullAdoptionForm.getAdopterPets(), adopterId));
         
         // Handles single/multiple household adults id generation, foreign key logic and insertion
-        fullAdoptionForm.setHouseholdAdults(saveHouseholdAdults(fullAdoptionForm.getHouseholdAdults(), adopterId));
+        fullAdoptionForm.setHouseholdAdults(adoptionFormInsertionLogic.saveHouseholdAdults(fullAdoptionForm.getHouseholdAdults(), adopterId));
     
         return ResponseEntity.ok(fullAdoptionForm);
     }
 
     // GET Function. Gets the record of an adopter specified by {adopterId}
+    @CrossOrigin(origins = "*")
     @GetMapping("/full-application/{adopterId}")
     public ResponseEntity<AdoptionApplicationDTO> getFullAdoptionApplication(@PathVariable String adopterId) {
         AdoptionApplicationDTO adopterFullApplicationForm = new AdoptionApplicationDTO();
@@ -213,30 +150,50 @@ public class MainController {
         return ResponseEntity.ok(adopterFullApplicationForm);
     }
     
-    // INCOMPLETE DO NOT TOUCH
+    // UPDATE (POST) Function. Updates the details of the adopter
     @CrossOrigin(origins = "*")
     @Transactional
     @PostMapping("full-application/update")
     public ResponseEntity<AdoptionApplicationDTO> updateFullAdoptionApplication(@RequestBody AdoptionApplicationDTO updated_fullAdoptionForm) {
         String adopterId = updated_fullAdoptionForm.getAdopter().getAdopterId();
+        String adopterAddressId = updated_fullAdoptionForm.getAdopter().getAddressDetails().getAdopterAddressId();
 
-        // When adopter updates spouse to be null (removes spouse)
-        if(updated_fullAdoptionForm.getAdopter().getSpouse() == null) {
-            spouseRepository.deleteSpouseRecord(adopterId);
-        }
+        Spouse tempSpouse = updated_fullAdoptionForm.getAdopter().getSpouse();
+        List<AdopterPets> tempAdopterPets = updated_fullAdoptionForm.getAdopterPets();
+        List<HouseholdAdults> tempHouseholdAdults = updated_fullAdoptionForm.getHouseholdAdults();
 
-        // When adopter updates adopter pets to be null (removes all adopter pets)
-        if(updated_fullAdoptionForm.getAdopterPets() == null) {
-            adopterPetsRepository.deleteAdopterPetsRecord(adopterId);
-        }
-
-        // When adopter updates household adults to be null (removes all household adults)
-        if(updated_fullAdoptionForm.getAdopterPets() == null) {
-            householdAdultsRepository.deleteHouseholdAdultsRecord(adopterId);
-        }
+        // Sets spouse to null to rebuild its state
+        updated_fullAdoptionForm.getAdopter().setSpouse(null);
         
+        // Concurrently update adopter details and adopter home details
         adopterRepository.save(updated_fullAdoptionForm.getAdopter());
+
+        // Clear all previous dependencies: Spouse, Adopter Pets, Household Adults
+        spouseRepository.deleteSpouseRecord(adopterId);
+        adopterPetsRepository.deleteAdopterPetsRecord(adopterId);
+        householdAdultsRepository.deleteHouseholdAdultsRecord(adopterId);
         
+        // If user updates spouse with details (not null/empty)
+        if(tempSpouse != null) {
+            tempSpouse = adoptionFormInsertionLogic.saveSpouse(tempSpouse, adopterId, adopterAddressId);
+            updated_fullAdoptionForm.getAdopter().setSpouse(tempSpouse);
+        }
+
+        // If user updates adopter pets with details (not null/empty)
+        if (tempAdopterPets != null || !tempAdopterPets.isEmpty()) {
+            tempAdopterPets = adoptionFormInsertionLogic.saveAdopterPets(tempAdopterPets, adopterId);
+        }
+
+        // If user updates household adults with details (not null/empty)
+        if (tempHouseholdAdults != null || !tempHouseholdAdults.isEmpty()) {
+            tempHouseholdAdults = adoptionFormInsertionLogic.saveHouseholdAdults(tempHouseholdAdults, adopterId);
+        }
+
+        // Updates the adoption form to contain the newly updated json with generated id's
+        updated_fullAdoptionForm.getAdopter().setSpouse(tempSpouse);
+        updated_fullAdoptionForm.setAdopterPets(tempAdopterPets);
+        updated_fullAdoptionForm.setHouseholdAdults(tempHouseholdAdults);
+
         return ResponseEntity.ok(updated_fullAdoptionForm);
     }
     

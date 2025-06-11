@@ -174,7 +174,7 @@ bt_POST.addEventListener("click", () => {
 });
 
 bt_UPDATE.addEventListener("click", () => {
-    updateAdopter(adopterData1);
+    // updateAdopter(adopterData1);
 })
 
 // INCOMPLETE DO NOT TOUCH UPDATE FUNCTION
