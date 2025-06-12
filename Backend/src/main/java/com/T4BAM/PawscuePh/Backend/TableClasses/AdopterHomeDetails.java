@@ -22,7 +22,7 @@ public class AdopterHomeDetails {
     private String state;
 
     @Column(name = "housingstatus")
-    private String housingStatus = "Rented";
+    private String housingStatus = "Rent";
 
     @Column(name = "homepetpolicy")
     private String homePetPolicy = "ALLOWED";
@@ -117,5 +117,21 @@ public class AdopterHomeDetails {
 
     public void setPetLivingArea(String petLivingArea) {
         this.petLivingArea = petLivingArea;
+    }
+
+    @Override
+public String toString() {
+    return "AdopterHomeDetails{" +
+            "adopterAddressId='" + adopterAddressId + '\'' +
+            ", zipcode='" + zipcode + '\'' +
+            ", homeAddress='" + homeAddress + '\'' +
+            ", city='" + city + '\'' +
+            ", state='" + state + '\'' +
+            ", housingStatus='" + housingStatus + '\'' +
+            ", homePetPolicy='" + homePetPolicy + '\'' +
+            ", windowScreens=" + windowScreens +
+            ", homeChildrenNum=" + homeChildrenNum +
+            ", petLivingArea='" + petLivingArea + '\'' +
+            '}';
     }
 }

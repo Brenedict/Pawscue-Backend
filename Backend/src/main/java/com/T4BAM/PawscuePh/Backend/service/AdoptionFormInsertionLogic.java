@@ -60,6 +60,7 @@ public class AdoptionFormInsertionLogic {
         // Attaches the adopterAddressId to the AdopterHomeDetails Class
         tempAdopterHomeDetails.setAdopterAddressId(adopterAddressId);
         
+        System.out.println(tempAdopterHomeDetails.toString());
         // Saves the home details to its respective relation
         adopterHomeDetailsRepository.save(tempAdopterHomeDetails);
 
@@ -83,6 +84,7 @@ public class AdoptionFormInsertionLogic {
         // Properly sets the adopter entity to contain it's spouse and home details which was previously removed
         adopter.setAddressDetails(tempAdopterHomeDetails);
         adopter.setSpouse(tempSpouse);
+
 
         return adopter;
     }

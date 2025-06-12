@@ -54,7 +54,7 @@ CREATE TABLE Adopter_Home_Details(
     HomeAddress VARCHAR(100) NOT NULL,
     City VARCHAR(50) NOT NULL,
     State VARCHAR(50) NOT NULL,
-    HousingStatus VARCHAR (6) NOT NULL DEFAULT 'Rented' CHECK(
+    HousingStatus VARCHAR (6) NOT NULL DEFAULT 'Rent' CHECK(
 			HousingStatus IN ("Own", "Rent", "Other")
         ),
 	HomePetPolicy VARCHAR(11) NOT NULL DEFAULT 'ALLOWED' CHECK(
