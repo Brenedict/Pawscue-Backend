@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // Entity Imports
@@ -150,11 +151,38 @@ public class MainController {
         return ResponseEntity.ok(adopterFullApplicationForm);
     }
     
+    @CrossOrigin(origins = "*")
+    @GetMapping("/full-application")
+    public List<AdoptionApplicationDTO> getAllAdoptionApplication() {
+        List<AdoptionApplicationDTO> adopterFullApplicationForm = new ArrayList<>();
+
+        List<Adopter> adopters = adopterRepository.findAll();
+
+        for (Adopter adopter : adopters) {
+            AdoptionApplicationDTO dto = new AdoptionApplicationDTO();
+
+            dto.setAdopter(adopter);
+            // Add other fields accordingly...
+
+            List<AdopterPets> pets = adopterPetsRepository.getAdopterPetsById(adopter.getAdopterId());
+            List<HouseholdAdults> adults = householdAdultsRepository.getHouseholdAdultsById(adopter.getAdopterId());
+
+            dto.setAdopterPets(pets);;
+            dto.setHouseholdAdults(adults);
+
+            adopterFullApplicationForm.add(dto);
+        }
+
+        return adopterFullApplicationForm;
+    }
+
     // UPDATE (POST) Function. Updates the details of the adopter
     @CrossOrigin(origins = "*")
     @Transactional
     @PostMapping("full-application/update")
     public ResponseEntity<AdoptionApplicationDTO> updateFullAdoptionApplication(@RequestBody AdoptionApplicationDTO updated_fullAdoptionForm) {
+        System.out.println(updated_fullAdoptionForm);
+
         String adopterId = updated_fullAdoptionForm.getAdopter().getAdopterId();
         String adopterAddressId = updated_fullAdoptionForm.getAdopter().getAddressDetails().getAdopterAddressId();
 
@@ -162,39 +190,65 @@ public class MainController {
         List<AdopterPets> tempAdopterPets = updated_fullAdoptionForm.getAdopterPets();
         List<HouseholdAdults> tempHouseholdAdults = updated_fullAdoptionForm.getHouseholdAdults();
 
-        // Sets spouse to null to rebuild its state
-        updated_fullAdoptionForm.getAdopter().setSpouse(null);
-        
-        // Concurrently update adopter details and adopter home details
-        adopterRepository.save(updated_fullAdoptionForm.getAdopter());
-
-        // Clear all previous dependencies: Spouse, Adopter Pets, Household Adults
+        //Clear previous FK dependencies FIRST
         spouseRepository.deleteSpouseRecord(adopterId);
         adopterPetsRepository.deleteAdopterPetsRecord(adopterId);
         householdAdultsRepository.deleteHouseholdAdultsRecord(adopterId);
-        
-        // If user updates spouse with details (not null/empty)
-        if(tempSpouse != null) {
+
+        // Set spouse to null *after FK rows are deleted*
+        updated_fullAdoptionForm.getAdopter().setSpouse(null);
+
+        // Save the adopter core data
+        adopterRepository.save(updated_fullAdoptionForm.getAdopter());
+
+        // Save new FK dependencies (spouse/pets/adults)
+        if (tempSpouse != null) {
             tempSpouse = adoptionFormInsertionLogic.saveSpouse(tempSpouse, adopterId, adopterAddressId);
             updated_fullAdoptionForm.getAdopter().setSpouse(tempSpouse);
         }
 
-        // If user updates adopter pets with details (not null/empty)
-        if (tempAdopterPets != null || !tempAdopterPets.isEmpty()) {
+        if (tempAdopterPets != null && !tempAdopterPets.isEmpty()) {
             tempAdopterPets = adoptionFormInsertionLogic.saveAdopterPets(tempAdopterPets, adopterId);
         }
 
-        // If user updates household adults with details (not null/empty)
-        if (tempHouseholdAdults != null || !tempHouseholdAdults.isEmpty()) {
+        if (tempHouseholdAdults != null && !tempHouseholdAdults.isEmpty()) {
             tempHouseholdAdults = adoptionFormInsertionLogic.saveHouseholdAdults(tempHouseholdAdults, adopterId);
         }
 
-        // Updates the adoption form to contain the newly updated json with generated id's
-        updated_fullAdoptionForm.getAdopter().setSpouse(tempSpouse);
+        // Update DTO before sending response
         updated_fullAdoptionForm.setAdopterPets(tempAdopterPets);
         updated_fullAdoptionForm.setHouseholdAdults(tempHouseholdAdults);
 
         return ResponseEntity.ok(updated_fullAdoptionForm);
     }
     
+    // NEW/MODIFIED GET endpoint to fetch all full adoption applications
+    @CrossOrigin(origins = "*")
+    @GetMapping("/full-application/all")
+    public ResponseEntity<List<AdoptionApplicationDTO>> getAllFullAdoptionApplications() {
+        List<AdoptionApplicationDTO> allApplications = new ArrayList<>();
+        List<Adopter> adopters = adopterRepository.findAll(); // Get all basic Adopter entities
+
+        for (Adopter adopter : adopters) {
+            AdoptionApplicationDTO applicationDTO = new AdoptionApplicationDTO();
+
+            // Re-fetch the Adopter by ID to ensure all lazily loaded relationships (like addressDetails and spouse) are fully initialized.
+            // This mirrors the behavior of getFullAdoptionApplication which loads all related data for a single ID.
+            Adopter fullyLoadedAdopter = adopterRepository.getAdopterById(adopter.getAdopterId());
+            if (fullyLoadedAdopter != null) {
+                applicationDTO.setAdopter(fullyLoadedAdopter); // Set the fully loaded adopter object
+            } else {
+                // Fallback if for some reason the adopter is not found by ID (shouldn't happen if findAll() returned it)
+                applicationDTO.setAdopter(adopter); // Use the original potentially incomplete adopter object
+                System.err.println("Warning: Adopter with ID " + adopter.getAdopterId() + " not found when re-fetching for full details.");
+            }
+
+            // Fetch and set AdopterPets and HouseholdAdults using the adopterId
+            applicationDTO.setAdopterPets(adopterPetsRepository.getAdopterPetsById(adopter.getAdopterId()));
+            applicationDTO.setHouseholdAdults(householdAdultsRepository.getHouseholdAdultsById(adopter.getAdopterId()));
+
+            allApplications.add(applicationDTO);
+        }
+        return ResponseEntity.ok(allApplications);
+    }
 }

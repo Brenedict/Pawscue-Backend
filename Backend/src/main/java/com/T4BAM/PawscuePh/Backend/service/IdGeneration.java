@@ -8,6 +8,7 @@ import com.T4BAM.PawscuePh.Backend.TableRepositories.AdopterPets_Repository;
 import com.T4BAM.PawscuePh.Backend.TableRepositories.Adopter_Repository;
 import com.T4BAM.PawscuePh.Backend.TableRepositories.HouseholdAdults_Repository;
 import com.T4BAM.PawscuePh.Backend.TableRepositories.Spouse_Repository;
+import com.T4BAM.PawscuePh.Backend.TableRepositories.AppData_Repository;
 
 @Service
 public class IdGeneration {
@@ -16,6 +17,7 @@ public class IdGeneration {
     private final AdopterPets_Repository adopterPetsRepository;
     private final HouseholdAdults_Repository householdAdultsRepository;
     private final Spouse_Repository spouseRepository;
+    private final AppData_Repository appDataRepository;
 
     @Autowired
     public IdGeneration(
@@ -23,7 +25,8 @@ public class IdGeneration {
             AdopterHomeDetails_Repository adopterHomeDetailsRepository,
             AdopterPets_Repository adopterPetsRepository,
             HouseholdAdults_Repository householdAdultsRepository,
-            Spouse_Repository spouseRepository
+            Spouse_Repository spouseRepository,
+            AppData_Repository appDataRepository
         ) 
     {
         this.adopterRepository = adopterRepository;
@@ -31,6 +34,7 @@ public class IdGeneration {
         this.adopterPetsRepository = adopterPetsRepository;
         this.householdAdultsRepository = householdAdultsRepository;
         this.spouseRepository = spouseRepository;
+        this.appDataRepository = appDataRepository;
     }
 
     public String generateAdopterId() {
@@ -85,6 +89,17 @@ public class IdGeneration {
         }
         else {
             return "AS-0000";
+        }
+    }
+
+    public String generateUserId() {
+        String lastId = appDataRepository.getLastId();
+        if(lastId != null && !lastId.isEmpty()) {
+            int numericPart = Integer.parseInt(lastId.substring(lastId.indexOf("-")+1));
+            return "USER-" + String.format("%04d", numericPart + 1);
+        }
+        else {
+            return "USER-0000";
         }
     }
 }
