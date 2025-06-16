@@ -65,31 +65,37 @@ public class MainController {
     }
 
     // General Fetch GET method requests
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/adopter")
     public List<Adopter> getAdopters() {
         return adopterRepository.findAll();
     }
     
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/adopter-home-details")
     public List<AdopterHomeDetails> getAdopterHomeDetails() {
         return adopterHomeDetailsRepository.findAll();
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/adopter-pets") 
     public List<AdopterPets> getAdopterPets() {
         return adopterPetsRepository.findAll();
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/household-adults")
     public List<HouseholdAdults> getHouseholdAdults() {
         return householdAdultsRepository.findAll();
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/spouse")
     public List<Spouse> getSpouse() {
         return spouseRepository.findAll();
     }
 
+    @CrossOrigin(origins = "*")
     @GetMapping(path = "/adopter/{adopterId}")
     public Adopter getAdopterById(@PathVariable String adopterId) {
         return adopterRepository.getAdopterById(adopterId);
